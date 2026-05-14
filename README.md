@@ -15,7 +15,7 @@ A **Model Context Protocol (MCP)** bridge between Cursor / Claude Code (and othe
 
 On the repository **Releases** page, download the archive that matches the **OS and architecture of the machine where the agent runs** (for example `figma-mcp-design-v1.0.0-linux-amd64.tar.gz`, or `.zip` on Windows).
 
-Each archive contains the **`mcp-server`** binary (and **`relay`** if you need to run the relay as a separate process). For MCP configuration in your IDE, use the absolute path to **`mcp-server`** (on Windows: `mcp-server.exe`).
+Each archive contains the **`figma-mcp-design`** binary (and **`figma-mcp-relay`** if you need to run the relay as a separate process). For MCP configuration in your IDE, use the absolute path to **`figma-mcp-design`** (on Windows: `figma-mcp-design.exe`).
 
 Extract to a fixed folder. Releases usually ship **`SHASUMS256.txt`** for checksum verification.
 
@@ -53,7 +53,7 @@ On Linux amd64, the MCP server path is typically:
 
    The snippets below are auto-filled with the binary detected for the OS this plugin is running on. If your agent runs on a different machine, swap the path for the matching binary.
 
-   If you installed from **GitHub Release** (archive), use the path to **`mcp-server`** (or **`mcp-server.exe`**) in the folder you extracted instead of `bin/<os-arch>/figma-mcp-design`.
+   If you installed from **GitHub Release** (archive), use the path to **`figma-mcp-design`** (or **`figma-mcp-design.exe`**) in the folder you extracted instead of `bin/<os-arch>/figma-mcp-design`.
 
 3. Paste the snippet into your agent (Cursor / Codex / Claude…), restart the agent, then return to the **Connection** tab and click **Connect**.
 

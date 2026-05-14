@@ -26,14 +26,14 @@ for pair in "${platforms[@]}"; do
   if [[ "$GOOS" == "windows" ]]; then
     ext=".exe"
   fi
-  CGO_ENABLED=0 GOOS="$GOOS" GOARCH="$GOARCH" go build -trimpath -ldflags="-s -w" -o "build/mcp-server${ext}" ./cmd/mcp-server
-  CGO_ENABLED=0 GOOS="$GOOS" GOARCH="$GOARCH" go build -trimpath -ldflags="-s -w" -o "build/relay${ext}" ./cmd/relay
+  CGO_ENABLED=0 GOOS="$GOOS" GOARCH="$GOARCH" go build -trimpath -ldflags="-s -w" -o "build/figma-mcp-design${ext}" ./cmd/mcp-server
+  CGO_ENABLED=0 GOOS="$GOOS" GOARCH="$GOARCH" go build -trimpath -ldflags="-s -w" -o "build/figma-mcp-relay${ext}" ./cmd/relay
 
   name="figma-mcp-design-${VERSION}-${GOOS}-${GOARCH}"
   if [[ "$GOOS" == "windows" ]]; then
-    (cd build && zip -q "../dist/${name}.zip" "mcp-server${ext}" "relay${ext}")
+    (cd build && zip -q "../dist/${name}.zip" "figma-mcp-design${ext}" "figma-mcp-relay${ext}")
   else
-    tar -czf "dist/${name}.tar.gz" -C build "mcp-server${ext}" "relay${ext}"
+    tar -czf "dist/${name}.tar.gz" -C build "figma-mcp-design${ext}" "figma-mcp-relay${ext}"
   fi
 done
 
