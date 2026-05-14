@@ -1,0 +1,1557 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Figma MCP Design</title>
+    <style>
+      :root {
+        --bg: #0f1115;
+        --bg-elevated: #161922;
+        --bg-card: #1a1e29;
+        --bg-input: #11141c;
+        --border: #232838;
+        --border-strong: #2e3447;
+        --text: #e7eaf3;
+        --text-muted: #9aa3b8;
+        --text-faint: #6b7388;
+        --accent: #18a0fb;
+        --accent-strong: #2eafff;
+        --accent-soft: rgba(24, 160, 251, 0.14);
+        --success: #4ade80;
+        --success-soft: rgba(74, 222, 128, 0.12);
+        --danger: #ff7a7a;
+        --danger-soft: rgba(255, 122, 122, 0.12);
+        --warning: #f5c469;
+        --warning-soft: rgba(245, 196, 105, 0.14);
+        --radius-sm: 8px;
+        --radius: 12px;
+        --radius-lg: 16px;
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+        --shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+        --transition: 160ms cubic-bezier(0.2, 0.8, 0.2, 1);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        height: 100%;
+      }
+
+      body {
+        margin: 0;
+        padding: 18px 18px 24px;
+        color: var(--text);
+        background:
+          radial-gradient(1100px 600px at -10% -20%, rgba(24, 160, 251, 0.08), transparent 60%),
+          radial-gradient(900px 500px at 120% 10%, rgba(180, 90, 255, 0.06), transparent 60%),
+          var(--bg);
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Helvetica, Arial, sans-serif;
+        font-size: 13px;
+        line-height: 1.5;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+      }
+
+      .container {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      h1,
+      h2,
+      h3 {
+        margin: 0;
+        color: #fff;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+      }
+
+      h1 {
+        font-size: 16px;
+      }
+
+      h2 {
+        font-size: 13px;
+        text-transform: none;
+        letter-spacing: 0;
+      }
+
+      p {
+        margin: 0;
+        color: var(--text-muted);
+      }
+
+      a {
+        color: var(--accent);
+      }
+
+      /* ---------- Header ---------- */
+      .app-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding-bottom: 4px;
+      }
+
+      .brand-mark {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        display: grid;
+        place-items: center;
+        background: linear-gradient(135deg, #18a0fb 0%, #5f6bff 60%, #a05bff 100%);
+        box-shadow: 0 6px 16px rgba(24, 160, 251, 0.35);
+        color: white;
+        flex-shrink: 0;
+      }
+
+      .brand-mark svg {
+        width: 18px;
+        height: 18px;
+      }
+
+      .app-header-text h1 {
+        font-size: 15px;
+      }
+
+      .app-header-text p {
+        font-size: 11px;
+        color: var(--text-faint);
+        margin-top: 2px;
+      }
+
+      /* ---------- Tabs ---------- */
+      .tabs {
+        display: flex;
+        gap: 4px;
+        padding: 4px;
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+      }
+
+      .tab {
+        flex: 1;
+        padding: 7px 10px;
+        text-align: center;
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--text-muted);
+        cursor: pointer;
+        border-radius: 7px;
+        transition: background var(--transition), color var(--transition);
+        user-select: none;
+      }
+
+      .tab:hover {
+        color: var(--text);
+      }
+
+      .tab.active {
+        background: var(--bg-card);
+        color: var(--text);
+        box-shadow: var(--shadow-sm);
+      }
+
+      .tab-content {
+        display: none;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      .tab-content.active {
+        display: flex;
+      }
+
+      /* ---------- Card ---------- */
+      .card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 14px;
+        box-shadow: var(--shadow-sm);
+      }
+
+      .card + .card {
+        margin-top: 0;
+      }
+
+      .card-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+
+      .card-title h2 {
+        font-size: 13px;
+      }
+
+      .card-title .badge {
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 2px 6px;
+        border-radius: 999px;
+        background: var(--accent-soft);
+        color: var(--accent);
+      }
+
+      .card p {
+        font-size: 12px;
+        color: var(--text-muted);
+        line-height: 1.55;
+      }
+
+      .card p + p {
+        margin-top: 6px;
+      }
+
+      .section {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      /* ---------- Form ---------- */
+      label {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 11px;
+        font-weight: 500;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+
+      input,
+      textarea {
+        width: 100%;
+        font-family: inherit;
+        color: var(--text);
+        background: var(--bg-input);
+        border: 1px solid var(--border-strong);
+        border-radius: var(--radius-sm);
+        transition: border-color var(--transition), box-shadow var(--transition);
+      }
+
+      input {
+        padding: 9px 11px;
+        font-size: 13px;
+        height: 36px;
+      }
+
+      input:focus,
+      textarea:focus {
+        outline: none;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px var(--accent-soft);
+      }
+
+      input:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+      }
+
+      textarea {
+        padding: 10px 12px;
+        font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco,
+          Consolas, "Liberation Mono", monospace;
+        font-size: 11.5px;
+        line-height: 1.55;
+        resize: vertical;
+        min-height: 64px;
+      }
+
+      code {
+        padding: 1px 6px;
+        border-radius: 5px;
+        background: rgba(255, 255, 255, 0.06);
+        color: #f0f4ff;
+        font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco,
+          Consolas, "Liberation Mono", monospace;
+        font-size: 11.5px;
+      }
+
+      /* ---------- Buttons ---------- */
+      button {
+        appearance: none;
+        font-family: inherit;
+        font-size: 13px;
+        font-weight: 500;
+        line-height: 1;
+        border: 1px solid transparent;
+        border-radius: var(--radius-sm);
+        padding: 9px 14px;
+        cursor: pointer;
+        transition: transform var(--transition), background var(--transition),
+          border-color var(--transition), box-shadow var(--transition),
+          color var(--transition);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+      }
+
+      button:active {
+        transform: translateY(1px);
+      }
+
+      button.primary,
+      button:not(.secondary):not(.ghost) {
+        color: white;
+        background: linear-gradient(180deg, #2eafff 0%, #18a0fb 100%);
+        box-shadow: 0 6px 16px rgba(24, 160, 251, 0.28),
+          inset 0 1px 0 rgba(255, 255, 255, 0.18);
+      }
+
+      button.primary:hover,
+      button:not(.secondary):not(.ghost):hover {
+        background: linear-gradient(180deg, #4cbbff 0%, #1aa6ff 100%);
+        box-shadow: 0 8px 22px rgba(24, 160, 251, 0.36),
+          inset 0 1px 0 rgba(255, 255, 255, 0.22);
+      }
+
+      button.secondary {
+        background: var(--bg-elevated);
+        border-color: var(--border-strong);
+        color: var(--text);
+      }
+
+      button.secondary:hover {
+        background: #1f2433;
+        border-color: #3a4159;
+      }
+
+      button.ghost {
+        background: transparent;
+        color: var(--text-muted);
+      }
+
+      button.ghost:hover {
+        color: var(--text);
+        background: var(--bg-elevated);
+      }
+
+      button.block {
+        width: 100%;
+        padding: 11px 14px;
+        font-size: 14px;
+      }
+
+      button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      /* ---------- Status pill ---------- */
+      .status {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 11px 12px;
+        border-radius: var(--radius-sm);
+        font-size: 12.5px;
+        line-height: 1.45;
+        border: 1px solid transparent;
+      }
+
+      .status .status-dot {
+        flex-shrink: 0;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-top: 5px;
+        background: currentColor;
+        box-shadow: 0 0 0 4px currentColor;
+        opacity: 0.95;
+      }
+
+      .status code {
+        background: rgba(0, 0, 0, 0.35);
+      }
+
+      .status.connected {
+        color: var(--success);
+        background: var(--success-soft);
+        border-color: rgba(74, 222, 128, 0.25);
+      }
+
+      .status.connected .status-dot {
+        box-shadow: 0 0 0 4px rgba(74, 222, 128, 0.18);
+      }
+
+      .status.disconnected {
+        color: var(--danger);
+        background: var(--danger-soft);
+        border-color: rgba(255, 122, 122, 0.25);
+      }
+
+      .status.disconnected .status-dot {
+        box-shadow: 0 0 0 4px rgba(255, 122, 122, 0.18);
+      }
+
+      .status.info {
+        color: var(--accent);
+        background: var(--accent-soft);
+        border-color: rgba(24, 160, 251, 0.3);
+      }
+
+      .status.info .status-dot {
+        box-shadow: 0 0 0 4px rgba(24, 160, 251, 0.22);
+        animation: pulse 1.4s ease-in-out infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1);
+          opacity: 0.7;
+        }
+        50% {
+          transform: scale(1.35);
+          opacity: 1;
+        }
+      }
+
+      /* ---------- Code block with copy ---------- */
+      .codeblock {
+        position: relative;
+      }
+
+      .codeblock textarea {
+        padding-right: 44px;
+      }
+
+      .copy-icon-btn {
+        position: absolute;
+        top: 6px;
+        right: 6px;
+        width: 30px;
+        height: 30px;
+        padding: 0;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--border);
+        color: var(--text-muted);
+        border-radius: 7px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .copy-icon-btn:hover {
+        color: var(--text);
+        background: rgba(255, 255, 255, 0.08);
+        border-color: var(--border-strong);
+      }
+
+      .copy-icon-btn svg {
+        width: 14px;
+        height: 14px;
+      }
+
+      .copy-icon-btn.copied {
+        color: var(--success);
+        border-color: rgba(74, 222, 128, 0.4);
+        background: var(--success-soft);
+      }
+
+      .config-actions {
+        display: flex;
+        gap: 8px;
+        margin-top: 10px;
+      }
+
+      .hint {
+        font-size: 11.5px;
+        color: var(--text-faint);
+        line-height: 1.55;
+      }
+
+      .hidden {
+        display: none !important;
+      }
+
+      /* ---------- Progress ---------- */
+      .progress-track {
+        width: 100%;
+        height: 8px;
+        background: var(--bg-input);
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        overflow: hidden;
+        margin-top: 8px;
+      }
+
+      .progress-bar {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, #18a0fb, #5f6bff, #a05bff);
+        background-size: 200% 100%;
+        border-radius: 999px;
+        transition: width 0.3s ease;
+        animation: shimmer 2.2s linear infinite;
+      }
+
+      @keyframes shimmer {
+        from {
+          background-position: 0% 0%;
+        }
+        to {
+          background-position: 200% 0%;
+        }
+      }
+
+      .progress-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 8px;
+        font-size: 11.5px;
+        color: var(--text-muted);
+      }
+
+      .operation-complete {
+        color: var(--success) !important;
+      }
+
+      .operation-error {
+        color: var(--danger) !important;
+      }
+
+      /* ---------- About / list ---------- */
+      ol.steps {
+        padding-left: 0;
+        margin: 6px 0 0 0;
+        counter-reset: step;
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      ol.steps li {
+        counter-increment: step;
+        position: relative;
+        padding-left: 28px;
+        font-size: 12.5px;
+        color: var(--text);
+        line-height: 1.5;
+      }
+
+      ol.steps li::before {
+        content: counter(step);
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: var(--accent-soft);
+        color: var(--accent);
+        font-size: 11px;
+        font-weight: 600;
+        display: grid;
+        place-items: center;
+      }
+
+      .footnote {
+        font-size: 10.5px;
+        color: var(--text-faint);
+        margin-top: 14px;
+        line-height: 1.55;
+      }
+
+      /* ---------- Scrollbars ---------- */
+      textarea::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+
+      textarea::-webkit-scrollbar-thumb {
+        background: var(--border-strong);
+        border-radius: 999px;
+      }
+
+      textarea::-webkit-scrollbar-thumb:hover {
+        background: #3d445b;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <header class="app-header">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M12 3v18M4 7.5l16 9M20 7.5l-16 9"
+              stroke="currentColor"
+              stroke-width="1.2"
+              stroke-linecap="round"
+              opacity="0.7"
+            />
+          </svg>
+        </div>
+        <div class="app-header-text">
+          <h1>Figma MCP Design</h1>
+          <p>Bridge Figma with MCP-compatible AI agents</p>
+        </div>
+      </header>
+
+      <nav class="tabs" role="tablist">
+        <div id="tab-connection" class="tab active" role="tab">Connection</div>
+        <div id="tab-config" class="tab" role="tab">MCP Config</div>
+        <div id="tab-about" class="tab" role="tab">About</div>
+      </nav>
+
+      <div id="content-connection" class="tab-content active">
+        <div class="card">
+          <div class="section">
+            <button id="btn-connect" class="primary block">Connect</button>
+
+            <div id="port-container">
+              <label for="port">WebSocket Server Port</label>
+              <input
+                type="number"
+                id="port"
+                placeholder="3055"
+                value="3055"
+                min="1024"
+                max="65535"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div id="connection-status" class="status disconnected">
+          <span class="status-dot"></span>
+          <span class="status-text">Not connected to Figma MCP Design relay</span>
+        </div>
+
+        <div id="mcp-config" class="card hidden">
+          <div class="card-title">
+            <h2>Active Channel</h2>
+            <span class="badge">live</span>
+          </div>
+          <p>Send this message to your agent right after it starts.</p>
+          <div class="codeblock">
+            <textarea id="mcp-json" rows="6" readonly></textarea>
+            <button id="btn-copy" class="copy-icon-btn" title="Copy to clipboard" aria-label="Copy">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="9" width="11" height="11" rx="2"></rect>
+                <path d="M5 15V5a2 2 0 0 1 2-2h10"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div id="progress-container" class="card hidden">
+          <div class="card-title">
+            <h2>Operation Progress</h2>
+          </div>
+          <div id="progress-message">No operation in progress</div>
+          <div class="progress-track">
+            <div id="progress-bar" class="progress-bar"></div>
+          </div>
+          <div class="progress-row">
+            <div id="progress-status">Not started</div>
+            <div id="progress-percentage">0%</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="content-config" class="tab-content">
+        <div class="card">
+          <div class="card-title">
+            <h2>Pick the right binary</h2>
+            <span class="badge">3 steps</span>
+          </div>
+          <p>
+            Install the binary that matches the OS/architecture where your
+            agent runs, then paste the matching snippet below into the
+            agent's MCP configuration.
+          </p>
+          <ol class="steps">
+            <li>
+              Locate the binary under
+              <code>figma-mcp-design/bin/&lt;os-arch&gt;/</code>. Available
+              targets:
+              <code>darwin-amd64</code>, <code>darwin-arm64</code>,
+              <code>linux-amd64</code>, <code>linux-arm64</code>,
+              <code>windows-amd64</code>, <code>windows-arm64</code>.
+            </li>
+            <li>
+              The snippets below are auto-filled with the binary detected
+              for the OS this plugin is running on. If your agent runs on a
+              different machine, swap the path for the matching binary.
+            </li>
+            <li>
+              Paste the snippet into your agent (Cursor / Codex / Claude…),
+              restart the agent, then return to the
+              <strong>Connection</strong> tab and click
+              <code>Connect</code>.
+            </li>
+          </ol>
+          <p class="hint" id="detected-target-hint">
+            Detected target:&nbsp;<code id="detected-target">…</code><br />
+            Suggested binary:&nbsp;<code id="detected-binary">…</code>
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            <h2>Cursor</h2>
+            <span class="badge">mcp.json</span>
+          </div>
+          <p>
+            Add this to Cursor's <code>mcp.json</code>. Adjust <code>cwd</code>
+            if the repository lives in another location.
+          </p>
+          <div class="codeblock">
+            <textarea id="cursor-config" rows="10" readonly></textarea>
+            <button
+              class="copy-icon-btn copy-config"
+              data-copy-target="cursor-config"
+              title="Copy Cursor config"
+              aria-label="Copy"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="9" width="11" height="11" rx="2"></rect>
+                <path d="M5 15V5a2 2 0 0 1 2-2h10"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            <h2>Codex</h2>
+            <span class="badge">toml</span>
+          </div>
+          <p>
+            Add this server to your Codex MCP configuration. Uses the local
+            stdio server built in Go.
+          </p>
+          <div class="codeblock">
+            <textarea id="codex-config" rows="6" readonly></textarea>
+            <button
+              class="copy-icon-btn copy-config"
+              data-copy-target="codex-config"
+              title="Copy Codex config"
+              aria-label="Copy"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="9" width="11" height="11" rx="2"></rect>
+                <path d="M5 15V5a2 2 0 0 1 2-2h10"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            <h2>Claude</h2>
+            <span class="badge">CLI</span>
+          </div>
+          <p>
+            For Claude Code, register the server with this command from the
+            repository root.
+          </p>
+          <div class="codeblock">
+            <textarea id="claude-config" rows="3" readonly></textarea>
+            <button
+              class="copy-icon-btn copy-config"
+              data-copy-target="claude-config"
+              title="Copy Claude command"
+              aria-label="Copy"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="9" width="11" height="11" rx="2"></rect>
+                <path d="M5 15V5a2 2 0 0 1 2-2h10"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <textarea id="https-config" class="hidden" readonly></textarea>
+      </div>
+
+      <div id="content-about" class="tab-content">
+        <div class="card">
+          <div class="card-title">
+            <h2>About</h2>
+            <span class="badge">v1.0.0</span>
+          </div>
+          <p>
+            This plugin lets MCP-compatible agents talk to Figma so AI tools
+            can read selections, create frames, replace text, and more.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            <h2>How to use</h2>
+          </div>
+          <ol class="steps">
+            <li>Start the Go WebSocket relay on port 3055.</li>
+            <li>Configure your MCP client from the <strong>MCP Config</strong> tab.</li>
+            <li>Connect the plugin and copy the generated channel name.</li>
+            <li>Run Figma tools from Cursor, Codex, Claude or any MCP agent.</li>
+          </ol>
+          <p class="footnote">
+            Anonymous usage analytics (plugin opens, command names,
+            success/error) are sent to Google Analytics to help improve the
+            plugin. No file content or personal data is collected.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // WebSocket connection state
+      const state = {
+        connected: false,
+        socket: null,
+        serverPort: 3055,
+        pendingRequests: new Map(),
+        channel: null,
+        commandTracking: new Map(),
+        attemptingConnect: false,
+        userInitiatedDisconnect: false,
+        cancelledByUser: false,
+      };
+
+      // --- Anonymous analytics (GA4 Measurement Protocol) ---
+      const analytics = (() => {
+        const MEASUREMENT_ID = "G-9YH0ER9BXC";
+        const API_SECRET = "Xqiy0AtbQt-Xbx4bdoc8Kw";
+        // Set ?_dbg=1 on the parent URL or window.__ANALYTICS_DEBUG__ = true
+        // to route events through GA4 DebugView and log validation errors.
+        const DEBUG = window.__ANALYTICS_DEBUG__ === true;
+        const HOST = "https://www.google-analytics.com";
+        const PATH = DEBUG ? "/debug/mp/collect" : "/mp/collect";
+        const ENDPOINT =
+          HOST +
+          PATH +
+          "?measurement_id=" +
+          MEASUREMENT_ID +
+          "&api_secret=" +
+          API_SECRET;
+        const sessionId = Date.now().toString();
+        const sessionStart = Date.now();
+        let clientId = null;
+        const queue = [];
+
+        function send(name, params) {
+          const eventParams = Object.assign(
+            {
+              session_id: sessionId,
+              engagement_time_msec: Math.max(100, Date.now() - sessionStart),
+            },
+            params || {}
+          );
+          if (DEBUG) eventParams.debug_mode = 1;
+          const body = {
+            client_id: clientId,
+            events: [{ name, params: eventParams }],
+          };
+          try {
+            const req = fetch(ENDPOINT, {
+              method: "POST",
+              body: JSON.stringify(body),
+              keepalive: true,
+            });
+            if (DEBUG) {
+              req
+                .then((r) => r.json())
+                .then((j) => console.log("[analytics debug]", name, j))
+                .catch((e) => console.warn("[analytics debug] error", e));
+            } else {
+              req.catch(() => {});
+            }
+          } catch (e) {
+            // analytics must never break the plugin
+          }
+        }
+
+        return {
+          track(event, params) {
+            if (!clientId) {
+              queue.push([event, params]);
+              return;
+            }
+            send(event, params);
+          },
+          setClientId(id) {
+            clientId = id;
+            while (queue.length) {
+              const [e, p] = queue.shift();
+              send(e, p);
+            }
+          },
+        };
+      })();
+      analytics.track("plugin_open");
+
+      // UI Elements
+      const portInput = document.getElementById("port");
+      const connectButton = document.getElementById("btn-connect");
+      const connectionStatus = document.getElementById("connection-status");
+
+      // Tabs
+      const tabs = document.querySelectorAll(".tab");
+      const tabContents = document.querySelectorAll(".tab-content");
+
+      // Add UI elements for progress tracking
+      const progressContainer = document.getElementById("progress-container");
+      const progressBar = document.getElementById("progress-bar");
+      const progressMessage = document.getElementById("progress-message");
+      const progressStatus = document.getElementById("progress-status");
+      const progressPercentage = document.getElementById("progress-percentage");
+
+      // Initialize UI
+      function updateConnectionStatus(isConnected, message) {
+        state.connected = isConnected;
+        const connecting = state.attemptingConnect;
+
+        let statusMessage =
+          message ||
+          (isConnected
+            ? "Connected to Figma MCP Design relay"
+            : "Not connected to Figma MCP Design relay");
+
+        // Show connect instructions only when fully idle (not while attempting)
+        if (!isConnected && !connecting) {
+          statusMessage += `<br><br><strong>How to connect:</strong><br>1. Set up your MCP config (see the <code>MCP Config</code> tab).<br>2. Start your agent (Cursor / Codex / Claude…).<br>3. Click the <code>Connect</code> button above to connect to the agent.`;
+        }
+
+        const statusTextEl = connectionStatus.querySelector(".status-text");
+        if (statusTextEl) {
+          statusTextEl.innerHTML = statusMessage;
+        } else {
+          connectionStatus.innerHTML = statusMessage;
+        }
+        connectionStatus.className = `status ${
+          isConnected ? "connected" : connecting ? "info" : "disconnected"
+        }`;
+
+        // Button + port reflect the current phase: idle / connecting / connected
+        if (connecting) {
+          connectButton.textContent = "Cancel";
+          connectButton.className = "secondary block";
+          portInput.disabled = true;
+        } else {
+          connectButton.textContent = isConnected ? "Disconnect" : "Connect";
+          connectButton.className = isConnected
+            ? "secondary block"
+            : "primary block";
+          portInput.disabled = isConnected;
+        }
+
+        // Show/hide MCP config card
+        const mcpConfig = document.getElementById("mcp-config");
+        mcpConfig.classList.toggle("hidden", !isConnected);
+
+        // Update MCP config text when showing
+        if (isConnected) {
+          updateMcpConfig();
+        }
+      }
+
+      // Connect to WebSocket server
+      async function connectToServer(port) {
+        try {
+          if (state.connected && state.socket) {
+            updateConnectionStatus(true, "Already connected to server");
+            return;
+          }
+
+          state.serverPort = port;
+          state.attemptingConnect = true;
+          state.userInitiatedDisconnect = false;
+          const wsUrl = `ws://localhost:${port}`;
+
+          state.socket = new WebSocket(wsUrl);
+
+          state.socket.onopen = () => {
+            // Generate random channel name
+            const channelName = generateChannelName();
+            console.log("Joining channel:", channelName);
+            state.channel = channelName;
+
+            // Join the channel using the same format as App.tsx
+            state.socket.send(
+              JSON.stringify({
+                type: "join",
+                channel: channelName.trim(),
+              })
+            );
+          };
+
+          state.socket.onmessage = (event) => {
+            try {
+              const data = JSON.parse(event.data);
+              console.log("Received message:", data);
+
+              if (data.type === "system") {
+                // Successfully joined channel
+                if (data.message && data.message.result) {
+                  state.attemptingConnect = false;
+                  state.connected = true;
+                  const channelName = data.channel;
+                  updateConnectionStatus(
+                    true,
+                    `Connected to server in channel: <strong>${channelName}</strong>`
+                  );
+                  analytics.track("channel_join", {
+                    port: state.serverPort,
+                    channel: channelName,
+                  });
+
+                  // Notify the plugin code
+                  parent.postMessage(
+                    {
+                      pluginMessage: {
+                        type: "notify",
+                        message: `Connected to Figma MCP Design relay on port ${port} in channel: ${channelName}`,
+                      },
+                    },
+                    "*"
+                  );
+                }
+              } else if (data.type === "error") {
+                console.error("Error:", data.message);
+                updateConnectionStatus(false, `Error: ${data.message}`);
+                state.socket.close();
+              }
+
+              handleSocketMessage(data);
+            } catch (error) {
+              console.error("Error parsing message:", error);
+            }
+          };
+
+          state.socket.onclose = () => {
+            const cancelledByUser = state.cancelledByUser;
+            const failedWhileConnecting = state.attemptingConnect;
+            const userInitiated = state.userInitiatedDisconnect;
+            state.attemptingConnect = false;
+            state.userInitiatedDisconnect = false;
+            state.cancelledByUser = false;
+            state.connected = false;
+            state.socket = null;
+            if (cancelledByUser) {
+              // The click handler already set the cancelled message; keep it.
+              updateConnectionStatus(
+                false,
+                `Connection on port <code>${state.serverPort}</code> cancelled. Click <code>Connect</code> to try again.`
+              );
+            } else if (failedWhileConnecting) {
+              updateConnectionStatus(
+                false,
+                `Couldn't reach the agent on port <code>${state.serverPort}</code>.<br>Please start your agent first, then click <code>Connect</code> again.`
+              );
+            } else if (userInitiated) {
+              updateConnectionStatus(false, "Disconnected from server");
+            } else {
+              updateConnectionStatus(
+                false,
+                "Connection to the agent was lost. Make sure the agent is still running, then click <code>Connect</code> again."
+              );
+            }
+          };
+
+          state.socket.onerror = (error) => {
+            console.error("WebSocket error:", error);
+            // Avoid overwriting the message here: onclose fires right after
+            // and renders the precise reason (failed to reach / dropped).
+            state.connected = false;
+          };
+        } catch (error) {
+          console.error("Connection error:", error);
+          state.attemptingConnect = false;
+          updateConnectionStatus(
+            false,
+            `Connection error: ${error.message || "Unknown error"}`
+          );
+        }
+      }
+
+      // Disconnect from websocket server
+      function disconnectFromServer() {
+        if (state.socket) {
+          state.userInitiatedDisconnect = true;
+          state.socket.close();
+          state.socket = null;
+          state.connected = false;
+          updateConnectionStatus(false, "Disconnected from server");
+        }
+      }
+
+      // Handle messages from the WebSocket
+      async function handleSocketMessage(payload) {
+        const data = payload.message;
+        console.log("handleSocketMessage", data);
+
+        // If it's a response to a previous request
+        if (data.id && state.pendingRequests.has(data.id)) {
+          const { resolve, reject } = state.pendingRequests.get(data.id);
+          state.pendingRequests.delete(data.id);
+
+          if (data.error) {
+            reject(new Error(data.error));
+          } else {
+            resolve(data.result);
+          }
+          return;
+        }
+
+        // If it's a new command
+        if (data.command) {
+          try {
+            state.activeRequestId = data.id;
+            state.commandTracking.set(data.id, {
+              command: data.command,
+              startedAt: Date.now(),
+            });
+
+            // Send the command to the plugin code
+            parent.postMessage(
+              {
+                pluginMessage: {
+                  type: "execute-command",
+                  id: data.id,
+                  command: data.command,
+                  params: data.params,
+                },
+              },
+              "*"
+            );
+          } catch (error) {
+            // Send error back to WebSocket
+            sendErrorResponse(
+              data.id,
+              error.message || "Error executing command"
+            );
+          }
+        }
+      }
+
+      function trackCommandResult(id, success, errorMessage) {
+        const meta = state.commandTracking.get(id);
+        if (!meta) return;
+        state.commandTracking.delete(id);
+        const params = {
+          command_name: String(meta.command || "unknown"),
+          success: success ? 1 : 0,
+          duration_ms: Date.now() - meta.startedAt,
+        };
+        if (!success && errorMessage) {
+          params.error_message = String(errorMessage).slice(0, 100);
+        }
+        analytics.track("command_executed", params);
+      }
+
+      // Send a command to the WebSocket server
+      async function sendCommand(command, params) {
+        return new Promise((resolve, reject) => {
+          if (!state.connected || !state.socket) {
+            reject(new Error("Not connected to server"));
+            return;
+          }
+
+          const id = generateId();
+          state.pendingRequests.set(id, { resolve, reject });
+
+          state.socket.send(
+            JSON.stringify({
+              id,
+              type: "message",
+              channel: state.channel,
+              message: {
+                id,
+                command,
+                params,
+              },
+            })
+          );
+
+          // Set timeout to reject the promise after 30 seconds
+          setTimeout(() => {
+            if (state.pendingRequests.has(id)) {
+              state.pendingRequests.delete(id);
+              reject(new Error("Request timed out"));
+            }
+          }, 30000);
+        });
+      }
+
+      // Send success response back to WebSocket
+      function sendSuccessResponse(id, result) {
+        if (!state.connected || !state.socket) {
+          console.error("Cannot send response: socket not connected");
+          return;
+        }
+
+        state.socket.send(
+          JSON.stringify({
+            id,
+            type: "message",
+            channel: state.channel,
+            message: {
+              id,
+              result,
+            },
+          })
+        );
+      }
+
+      // Send error response back to WebSocket
+      function sendErrorResponse(id, errorMessage) {
+        if (!state.connected || !state.socket) {
+          console.error("Cannot send error response: socket not connected");
+          return;
+        }
+
+        state.socket.send(
+          JSON.stringify({
+            id,
+            type: "message",
+            channel: state.channel,
+            message: {
+              id,
+              error: errorMessage,
+              result: {},
+            },
+          })
+        );
+      }
+
+      // Helper to generate unique IDs
+      function generateId() {
+        return (
+          Date.now().toString(36) + Math.random().toString(36).substr(2, 5)
+        );
+      }
+
+      // Add this function after the generateId() function
+      function generateChannelName() {
+        const characters = "abcdefghijklmnopqrstuvwxyz0123456789";
+        let result = "";
+        for (let i = 0; i < 8; i++) {
+          result += characters.charAt(
+            Math.floor(Math.random() * characters.length)
+          );
+        }
+        return result;
+      }
+
+      // Tab switching
+      tabs.forEach((tab) => {
+        tab.addEventListener("click", () => {
+          tabs.forEach((t) => t.classList.remove("active"));
+          tabContents.forEach((c) => c.classList.remove("active"));
+
+          tab.classList.add("active");
+          const contentId = "content-" + tab.id.split("-")[1];
+          document.getElementById(contentId).classList.add("active");
+        });
+      });
+
+      // Single toggle button: Connect → Cancel (while connecting) → Disconnect
+      connectButton.addEventListener("click", () => {
+        if (state.attemptingConnect) {
+          // Cancel an in-flight connection attempt with the current port
+          state.attemptingConnect = false;
+          state.userInitiatedDisconnect = true;
+          state.cancelledByUser = true;
+          if (state.socket) {
+            try {
+              state.socket.close();
+            } catch (e) {}
+          }
+          updateConnectionStatus(
+            false,
+            `Connection on port <code>${
+              state.serverPort
+            }</code> cancelled. Click <code>Connect</code> to try again.`
+          );
+          return;
+        }
+        if (state.connected) {
+          updateConnectionStatus(false, "Disconnecting...");
+          connectionStatus.className = "status info";
+          disconnectFromServer();
+        } else {
+          const port = parseInt(portInput.value, 10) || 3055;
+          state.attemptingConnect = true;
+          updateConnectionStatus(false, `Connecting to port <code>${port}</code>...`);
+          connectToServer(port);
+        }
+      });
+
+      // Function to update progress UI
+      function updateProgressUI(progressData) {
+        // Show progress container if hidden
+        progressContainer.classList.remove("hidden");
+
+        // Update progress bar
+        const progress = progressData.progress || 0;
+        progressBar.style.width = `${progress}%`;
+        progressPercentage.textContent = `${progress}%`;
+
+        // Update message
+        progressMessage.textContent =
+          progressData.message || "Operation in progress";
+
+        // Update status text based on operation state
+        if (progressData.status === "started") {
+          progressStatus.textContent = "Started";
+          progressStatus.className = "";
+        } else if (progressData.status === "in_progress") {
+          progressStatus.textContent = "In Progress";
+          progressStatus.className = "";
+        } else if (progressData.status === "completed") {
+          progressStatus.textContent = "Completed";
+          progressStatus.className = "operation-complete";
+
+          // Hide progress container after 5 seconds
+          setTimeout(() => {
+            progressContainer.classList.add("hidden");
+          }, 5000);
+        } else if (progressData.status === "error") {
+          progressStatus.textContent = "Error";
+          progressStatus.className = "operation-error";
+        }
+      }
+
+      // Send operation progress update to server
+      function sendProgressUpdateToServer(progressData) {
+        if (!state.connected || !state.socket) {
+          console.error("Cannot send progress update: socket not connected");
+          return;
+        }
+
+        console.log("Sending progress update to server:", progressData);
+
+        const requestId = state.activeRequestId || progressData.commandId;
+        state.socket.send(
+          JSON.stringify({
+            id: requestId,
+            type: "progress_update",
+            channel: state.channel,
+            message: {
+              id: requestId,
+              type: "progress_update",
+              data: progressData,
+            },
+          })
+        );
+      }
+
+      // Reset progress UI
+      function resetProgressUI() {
+        progressContainer.classList.add("hidden");
+        progressBar.style.width = "0%";
+        progressMessage.textContent = "No operation in progress";
+        progressStatus.textContent = "Not started";
+        progressStatus.className = "";
+        progressPercentage.textContent = "0%";
+      }
+
+      // Listen for messages from the plugin code
+      window.onmessage = (event) => {
+        const message = event.data.pluginMessage;
+        if (!message) return;
+
+        console.log("Received message from plugin:", message);
+
+        switch (message.type) {
+          case "connection-status":
+            updateConnectionStatus(message.connected, message.message);
+            break;
+          case "auto-connect":
+            connectButton.click();
+            break;
+          case "auto-disconnect":
+            connectButton.click();
+            break;
+          case "command-result":
+            // Forward the result from plugin code back to WebSocket
+            sendSuccessResponse(message.id, message.result);
+            trackCommandResult(message.id, true);
+            break;
+          case "command-error":
+            // Forward the error from plugin code back to WebSocket
+            sendErrorResponse(message.id, message.error);
+            trackCommandResult(message.id, false, message.error);
+            break;
+          case "command_progress":
+            // Update UI with progress information
+            updateProgressUI(message);
+            // Forward progress update to server
+            sendProgressUpdateToServer(message);
+            break;
+          case "analytics-client-id":
+            analytics.setClientId(message.clientId);
+            break;
+        }
+      };
+
+      // Flash a checkmark on icon buttons (no textContent mutation -> SVG safe)
+      function flashCopied(button) {
+        button.classList.add("copied");
+        button.setAttribute("title", "Copied!");
+        clearTimeout(button._copyTimer);
+        button._copyTimer = setTimeout(() => {
+          button.classList.remove("copied");
+          button.setAttribute(
+            "title",
+            button.dataset.copyTarget
+              ? "Copy to clipboard"
+              : "Copy to clipboard"
+          );
+        }, 1600);
+      }
+
+      document.getElementById("btn-copy").addEventListener("click", () => {
+        const textarea = document.getElementById("mcp-json");
+        textarea.select();
+        document.execCommand("copy");
+        flashCopied(document.getElementById("btn-copy"));
+      });
+
+      document.querySelectorAll(".copy-config").forEach((button) => {
+        button.addEventListener("click", () => {
+          const target = document.getElementById(button.dataset.copyTarget);
+          if (!target) return;
+          target.select();
+          document.execCommand("copy");
+          flashCopied(button);
+        });
+      });
+
+      // Add this function to the script section
+      function updateMcpConfig() {
+        const binaryInfo = detectBinaryInfo();
+        const serverBinary = binaryInfo.serverBinary;
+        const cursorConfig = {
+          mcpServers: {
+            FigmaMCPDesign: {
+              command: serverBinary,
+              args: [],
+            },
+          },
+        };
+
+        const channelConfig = {
+          tool: "join_channel",
+          arguments: {
+            channel: state.channel || "connect-plugin-first",
+          },
+          note: "Call this first, then use get_document_info, get_selection, read_my_design, or editing tools.",
+        };
+
+        const codexConfig = `[mcp_servers.FigmaMCPDesign]
+command = "${serverBinary}"
+args = []`;
+
+        const claudeConfig = `claude mcp add FigmaMCPDesign -- "${serverBinary}"`;
+
+        const httpsConfig = {
+          mcpServers: {
+            FigmaMCPDesign: {
+              type: "streamable-http",
+              url: "https://your-domain.example.com/mcp",
+              headers: {
+                Authorization: "Bearer YOUR_TOKEN_IF_REQUIRED",
+              },
+            },
+          },
+        };
+
+        document.getElementById("mcp-json").value = JSON.stringify(
+          channelConfig,
+          null,
+          2
+        );
+        document.getElementById("cursor-config").value = JSON.stringify(
+          cursorConfig,
+          null,
+          2
+        );
+        document.getElementById("codex-config").value = codexConfig;
+        document.getElementById("claude-config").value = claudeConfig;
+        document.getElementById("https-config").value = JSON.stringify(
+          httpsConfig,
+          null,
+          2
+        );
+
+        const targetEl = document.getElementById("detected-target");
+        const binaryEl = document.getElementById("detected-binary");
+        if (targetEl) targetEl.textContent = binaryInfo.target;
+        if (binaryEl) binaryEl.textContent = binaryInfo.serverBinary;
+      }
+
+      function detectBinaryInfo() {
+        const platform = `${navigator.platform || ""} ${
+          navigator.userAgent || ""
+        }`.toLowerCase();
+        const arch = detectArch(platform);
+
+        if (platform.includes("win")) {
+          const projectPath = "C:\\\\path-to-project\\\\figma-mcp-design";
+          const target = `windows-${arch}`;
+          return {
+            target,
+            serverBinary: `${projectPath}\\\\bin\\\\${target}\\\\figma-mcp-design.exe`,
+          };
+        }
+
+        if (platform.includes("mac") || platform.includes("darwin")) {
+          const projectPath = "/path-to-project/figma-mcp-design";
+          const target = `darwin-${arch}`;
+          return {
+            target,
+            serverBinary: `${projectPath}/bin/${target}/figma-mcp-design`,
+          };
+        }
+
+        const projectPath = "/path-to-project/figma-mcp-design";
+        const target = `linux-${arch}`;
+        return {
+          target,
+          serverBinary: `${projectPath}/bin/${target}/figma-mcp-design`,
+        };
+      }
+
+      function detectArch(platform) {
+        if (
+          platform.includes("arm64") ||
+          platform.includes("aarch64") ||
+          platform.includes("apple silicon")
+        ) {
+          return "arm64";
+        }
+        return "amd64";
+      }
+
+      updateMcpConfig();
+    </script>
+  </body>
+</html>
