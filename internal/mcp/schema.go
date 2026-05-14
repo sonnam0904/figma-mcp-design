@@ -25,10 +25,12 @@ func arrayOf(description string, items map[string]any) map[string]any {
 }
 
 func colorSchema(description string) map[string]any {
-	return objectSchema([]string{"r", "g", "b"}, map[string]any{
+	s := objectSchema([]string{"r", "g", "b"}, map[string]any{
 		"r": prop("number", "Red component (0-1)"),
 		"g": prop("number", "Green component (0-1)"),
 		"b": prop("number", "Blue component (0-1)"),
 		"a": prop("number", "Alpha component (0-1)"),
 	})
+	s["description"] = description
+	return s
 }
