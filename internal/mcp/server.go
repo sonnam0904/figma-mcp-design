@@ -219,6 +219,12 @@ func (s *Server) dispatch(name string, args map[string]any) (any, error) {
 		payload["scale"] = numberOrDefault(args["scale"], 1)
 		return s.figma.SendCommand(name, payload, 60*time.Second)
 
+	case "create_image":
+		return s.figma.SendCommand(name, args, 120*time.Second)
+
+	case "get_variables":
+		return s.figma.SendCommand(name, args, 60*time.Second)
+
 	case "get_instance_overrides":
 		return s.figma.SendCommand(name, map[string]any{
 			"instanceNodeId": args["nodeId"],

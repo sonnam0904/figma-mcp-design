@@ -16,7 +16,7 @@ func formatToolResult(name string, args map[string]any, result any) (toolCallRes
 		return textResult(fmt.Sprintf("Successfully joined channel: %s", channel)), nil
 
 	case "get_document_info", "get_selection", "read_my_design",
-		"get_styles", "get_local_components", "get_annotations",
+		"get_styles", "get_variables", "get_local_components", "get_annotations",
 		"set_annotation", "create_component_instance",
 		"delete_multiple_nodes":
 		return jsonResult(result)
@@ -47,6 +47,27 @@ func formatToolResult(name string, args map[string]any, result any) (toolCallRes
 		m := asMap(result)
 		return textResult(fmt.Sprintf("Created text \"%s\" with ID: %s",
 			asString(m["name"]), asString(m["id"]))), nil
+
+	case "create_image":
+		m := asMap(result)
+		return textResult(fmt.Sprintf("Created image rectangle \"%s\" with ID: %s (imageHash: %s)",
+			asString(m["name"]), asString(m["id"]), asString(m["imageHash"]))), nil
+
+	case "apply_style":
+		m := asMap(result)
+		return textResult(fmt.Sprintf("Applied %s style %s to node \"%s\" (%s)",
+			asString(m["styleType"]), asString(m["styleId"]), asString(m["name"]), asString(m["nodeId"]))), nil
+
+	case "set_variable_binding":
+		m := asMap(result)
+		if !asBool(m["success"], false) {
+			return jsonResult(result)
+		}
+		if asBool(m["unbind"], false) {
+			return textResult(fmt.Sprintf("Unbound variable on field %s for node %s", asString(m["field"]), asString(m["nodeId"]))), nil
+		}
+		return textResult(fmt.Sprintf("Bound variable %s to field %s on node %s",
+			asString(m["variableId"]), asString(m["field"]), asString(m["nodeId"]))), nil
 
 	case "set_fill_color":
 		m := asMap(result)

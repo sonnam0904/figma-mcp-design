@@ -57,24 +57,6 @@ async function sendProgressUpdate(
 // Show UI
 figma.showUI(__html__, { width: 350, height: 600 });
 
-// Initialize anonymous analytics client_id (persisted via clientStorage)
-(async () => {
-  try {
-    let clientId = await figma.clientStorage.getAsync("analyticsClientId");
-    if (!clientId) {
-      clientId =
-        Date.now().toString(36) +
-        "-" +
-        Math.random().toString(36).slice(2, 10) +
-        Math.random().toString(36).slice(2, 10);
-      await figma.clientStorage.setAsync("analyticsClientId", clientId);
-    }
-    figma.ui.postMessage({ type: "analytics-client-id", clientId });
-  } catch (e) {
-    console.error("analytics init failed:", e);
-  }
-})();
-
 // Plugin commands from UI
 figma.ui.onmessage = async (msg) => {
   switch (msg.type) {
@@ -148,6 +130,10 @@ async function handleCommand(command, params) {
       return await createFrame(params);
     case "create_text":
       return await createText(params);
+    case "create_image":
+      return await createImage(params);
+    case "apply_style":
+      return await applyStyle(params);
     case "set_fill_color":
       return await setFillColor(params);
     case "set_stroke_color":
@@ -162,6 +148,10 @@ async function handleCommand(command, params) {
       return await deleteMultipleNodes(params);
     case "get_styles":
       return await getStyles();
+    case "get_variables":
+      return await getVariables(params);
+    case "set_variable_binding":
+      return await setVariableBinding(params);
     case "get_local_components":
       return await getLocalComponents(params);
     // case "get_team_components":
@@ -231,6 +221,7 @@ async function handleCommand(command, params) {
           throw new Error("Missing sourceInstanceId parameter");
         }
       }
+      throw new Error("Missing or invalid targetNodeIds parameter");
     case "set_layout_mode":
       return await setLayoutMode(params);
     case "set_padding":
@@ -289,14 +280,34 @@ async function getDocumentInfo() {
 }
 
 async function getSelection() {
-  return {
-    selectionCount: figma.currentPage.selection.length,
-    selection: figma.currentPage.selection.map((node) => ({
+  await figma.currentPage.loadAsync();
+  const page = figma.currentPage;
+  const sel = page.selection;
+  const selection = [];
+  for (let i = 0; i < sel.length; i++) {
+    const node = sel[i];
+    const entry = {
       id: node.id,
       name: node.name,
       type: node.type,
       visible: node.visible,
-    })),
+    };
+    if ("width" in node && "height" in node) {
+      entry.width = node.width;
+      entry.height = node.height;
+    }
+    if ("x" in node && "y" in node) {
+      entry.x = node.x;
+      entry.y = node.y;
+    }
+    selection.push(entry);
+  }
+  return {
+    documentId: figma.root.id,
+    documentName: figma.root.name,
+    currentPage: { id: page.id, name: page.name },
+    selectionCount: selection.length,
+    selection,
   };
 }
 
@@ -924,6 +935,158 @@ async function createText(params) {
   };
 }
 
+const MAX_DECODED_IMAGE_BYTES = 15 * 1024 * 1024;
+
+function decodeBase64ToUint8Array(imageBase64) {
+  if (!imageBase64 || typeof imageBase64 !== "string") {
+    throw new Error("imageBase64 must be a non-empty string");
+  }
+  var trimmed = imageBase64.replace(/\s/g, "");
+  var b64 = trimmed;
+  if (b64.indexOf(",") !== -1) {
+    b64 = b64.split(",")[1] || "";
+  }
+  try {
+    var binary = atob(b64);
+    var len = binary.length;
+    if (len > MAX_DECODED_IMAGE_BYTES) {
+      throw new Error(
+        "Decoded image exceeds maximum size (" +
+          MAX_DECODED_IMAGE_BYTES +
+          " bytes). Use a smaller PNG or JPEG."
+      );
+    }
+    var bytes = new Uint8Array(len);
+    for (var i = 0; i < len; i++) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    return bytes;
+  } catch (e) {
+    throw new Error("Invalid base64 image data: " + (e && e.message ? e.message : String(e)));
+  }
+}
+
+async function createImage(params) {
+  var _params = params || {};
+  var x = _params.x !== undefined ? _params.x : 0;
+  var y = _params.y !== undefined ? _params.y : 0;
+  var width = _params.width !== undefined ? _params.width : 100;
+  var height = _params.height !== undefined ? _params.height : 100;
+  var name = _params.name !== undefined ? _params.name : "Image";
+  var parentId = _params.parentId;
+  var imageBase64 = _params.imageBase64;
+  var scaleMode = _params.scaleMode !== undefined ? _params.scaleMode : "FIT";
+
+  if (!imageBase64) {
+    throw new Error("Missing imageBase64 (raw base64 of PNG or JPEG bytes, optional data URL prefix)");
+  }
+
+  var bytes = decodeBase64ToUint8Array(imageBase64);
+  var image = figma.createImage(bytes);
+
+  var rect = figma.createRectangle();
+  rect.name = name;
+  rect.x = x;
+  rect.y = y;
+  rect.resize(width, height);
+
+  var mode = "FIT";
+  if (scaleMode === "FILL" || scaleMode === "CROP" || scaleMode === "TILE" || scaleMode === "FIT") {
+    mode = scaleMode;
+  }
+
+  rect.fills = [
+    {
+      type: "IMAGE",
+      scaleMode: mode,
+      imageHash: image.hash,
+    },
+  ];
+
+  if (parentId) {
+    var parentNode = await figma.getNodeByIdAsync(parentId);
+    if (!parentNode) {
+      throw new Error("Parent node not found with ID: " + parentId);
+    }
+    if (!("appendChild" in parentNode)) {
+      throw new Error("Parent node does not support children: " + parentId);
+    }
+    parentNode.appendChild(rect);
+  } else {
+    figma.currentPage.appendChild(rect);
+  }
+
+  return {
+    id: rect.id,
+    name: rect.name,
+    type: rect.type,
+    x: rect.x,
+    y: rect.y,
+    width: rect.width,
+    height: rect.height,
+    imageHash: image.hash,
+    parentId: rect.parent ? rect.parent.id : undefined,
+  };
+}
+
+async function applyStyle(params) {
+  var _params = params || {};
+  var nodeId = _params.nodeId;
+  var styleId = _params.styleId;
+  var styleType = _params.styleType;
+
+  if (!nodeId || !styleId || !styleType) {
+    throw new Error("Missing nodeId, styleId, or styleType parameter");
+  }
+
+  var node = await figma.getNodeByIdAsync(nodeId);
+  if (!node) {
+    throw new Error("Node not found with ID: " + nodeId);
+  }
+
+  var st = String(styleType).toUpperCase();
+  if (st === "FILL" || st === "PAINT") {
+    if (!("fillStyleId" in node)) {
+      throw new Error("Node does not support fill styles: " + nodeId);
+    }
+    node.fillStyleId = styleId;
+  } else if (st === "STROKE") {
+    if (!("strokeStyleId" in node)) {
+      throw new Error("Node does not support stroke styles: " + nodeId);
+    }
+    node.strokeStyleId = styleId;
+  } else if (st === "TEXT") {
+    if (node.type !== "TEXT") {
+      throw new Error("styleType TEXT applies only to TEXT nodes");
+    }
+    node.textStyleId = styleId;
+  } else if (st === "EFFECT") {
+    if (!("effectStyleId" in node)) {
+      throw new Error("Node does not support effect styles: " + nodeId);
+    }
+    node.effectStyleId = styleId;
+  } else if (st === "GRID") {
+    if (!("gridStyleId" in node)) {
+      throw new Error("Node does not support grid styles: " + nodeId);
+    }
+    node.gridStyleId = styleId;
+  } else {
+    throw new Error(
+      "Unknown styleType: " +
+        styleType +
+        ". Use FILL (or PAINT), STROKE, TEXT, EFFECT, or GRID. Match style id to the list from get_styles (colors / texts / effects / grids)."
+    );
+  }
+
+  return {
+    success: true,
+    nodeId: node.id,
+    name: node.name,
+    styleId: styleId,
+    styleType: st,
+  };
+}
+
 async function setFillColor(params) {
   console.log("setFillColor", params);
   const {
@@ -1145,6 +1308,186 @@ async function getStyles() {
       name: style.name,
       key: style.key,
     })),
+  };
+}
+
+function serializeVariableValue(val) {
+  if (val === undefined || val === null) {
+    return null;
+  }
+  if (typeof val === "number" || typeof val === "string" || typeof val === "boolean") {
+    return val;
+  }
+  if (typeof val === "object") {
+    if (val.type === "VARIABLE_ALIAS" && val.id) {
+      return { type: "VARIABLE_ALIAS", id: val.id };
+    }
+    if ("r" in val && "g" in val && "b" in val) {
+      return { r: val.r, g: val.g, b: val.b, a: val.a !== undefined ? val.a : 1 };
+    }
+    if ("family" in val && "style" in val) {
+      return { family: val.family, style: val.style };
+    }
+    if ("unit" in val && "value" in val) {
+      return { unit: val.unit, value: val.value };
+    }
+    if (Array.isArray(val)) {
+      return val.map(serializeVariableValue);
+    }
+  }
+  try {
+    return JSON.parse(JSON.stringify(val));
+  } catch (e) {
+    return String(val);
+  }
+}
+
+function serializeVariableValues(valuesByMode) {
+  if (!valuesByMode || typeof valuesByMode !== "object") {
+    return {};
+  }
+  var out = {};
+  var keys = Object.keys(valuesByMode);
+  for (var i = 0; i < keys.length; i++) {
+    var k = keys[i];
+    out[k] = serializeVariableValue(valuesByMode[k]);
+  }
+  return out;
+}
+
+async function getVariables(params) {
+  if (!figma.variables) {
+    throw new Error("figma.variables API is not available in this Figma build");
+  }
+  var resolvedType =
+    params && params.resolvedType && String(params.resolvedType).length > 0
+      ? params.resolvedType
+      : undefined;
+
+  var collections = await figma.variables.getLocalVariableCollectionsAsync();
+  var variables = resolvedType
+    ? await figma.variables.getLocalVariablesAsync(resolvedType)
+    : await figma.variables.getLocalVariablesAsync();
+
+  return {
+    collections: collections.map(function (c) {
+      return {
+        id: c.id,
+        name: c.name,
+        modes: c.modes.map(function (m) {
+          return { modeId: m.modeId, name: m.name };
+        }),
+      };
+    }),
+    variables: variables.map(function (v) {
+      return {
+        id: v.id,
+        name: v.name,
+        resolvedType: v.resolvedType,
+        variableCollectionId: v.variableCollectionId,
+        valuesByMode: serializeVariableValues(v.valuesByMode),
+      };
+    }),
+  };
+}
+
+async function setVariableBinding(params) {
+  var p = params || {};
+  var nodeId = p.nodeId;
+  var variableId = p.variableId;
+  var field = p.field;
+  var unbind = !!p.unbind;
+  var fillIndex = p.fillIndex !== undefined && p.fillIndex !== null ? Number(p.fillIndex) : 0;
+  var strokeIndex =
+    p.strokeIndex !== undefined && p.strokeIndex !== null ? Number(p.strokeIndex) : 0;
+
+  if (!nodeId || !field) {
+    throw new Error("Missing nodeId or field");
+  }
+  if (!unbind && !variableId) {
+    throw new Error("Missing variableId (set unbind: true to remove a binding)");
+  }
+
+  if (!figma.variables) {
+    throw new Error("figma.variables API is not available in this Figma build");
+  }
+
+  var node = await figma.getNodeByIdAsync(nodeId);
+  if (!node) {
+    throw new Error("Node not found with ID: " + nodeId);
+  }
+
+  var variable =
+    !unbind && variableId ? await figma.variables.getVariableByIdAsync(variableId) : null;
+  if (!unbind && variableId && !variable) {
+    throw new Error("Variable not found with ID: " + variableId);
+  }
+
+  var f = String(field);
+
+  if (f === "fillPaintColor") {
+    if (!("fills" in node)) {
+      throw new Error("Node does not support fills");
+    }
+    var fills = node.fills === figma.mixed ? [] : node.fills.slice();
+    while (fills.length <= fillIndex) {
+      fills.push({ type: "SOLID", color: { r: 0, g: 0, b: 0 } });
+    }
+    var paint = fills[fillIndex];
+    if (paint.type !== "SOLID") {
+      throw new Error(
+        "Fill at index " + fillIndex + " must be SOLID to bind a COLOR variable"
+      );
+    }
+    fills[fillIndex] = figma.variables.setBoundVariableForPaint(paint, "color", variable);
+    node.fills = fills;
+    return {
+      success: true,
+      nodeId: node.id,
+      field: f,
+      fillIndex: fillIndex,
+      variableId: variable ? variable.id : null,
+      unbind: unbind,
+    };
+  }
+
+  if (f === "strokePaintColor") {
+    if (!("strokes" in node)) {
+      throw new Error("Node does not support strokes");
+    }
+    var strokes = node.strokes === figma.mixed ? [] : node.strokes.slice();
+    while (strokes.length <= strokeIndex) {
+      strokes.push({ type: "SOLID", color: { r: 0, g: 0, b: 0 } });
+    }
+    var sp = strokes[strokeIndex];
+    if (sp.type !== "SOLID") {
+      throw new Error(
+        "Stroke at index " + strokeIndex + " must be SOLID to bind a COLOR variable"
+      );
+    }
+    strokes[strokeIndex] = figma.variables.setBoundVariableForPaint(sp, "color", variable);
+    node.strokes = strokes;
+    return {
+      success: true,
+      nodeId: node.id,
+      field: f,
+      strokeIndex: strokeIndex,
+      variableId: variable ? variable.id : null,
+      unbind: unbind,
+    };
+  }
+
+  if (!("setBoundVariable" in node) || typeof node.setBoundVariable !== "function") {
+    throw new Error("This node type does not support setBoundVariable for field: " + f);
+  }
+
+  node.setBoundVariable(f, variable);
+  return {
+    success: true,
+    nodeId: node.id,
+    field: f,
+    variableId: variable ? variable.id : null,
+    unbind: unbind,
   };
 }
 

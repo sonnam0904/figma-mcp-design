@@ -37,7 +37,7 @@ func tools() []tool {
 
 	return []tool{
 		{"get_document_info", "Get detailed information about the current Figma document", noArgs},
-		{"get_selection", "Get information about the current selection in Figma", noArgs},
+		{"get_selection", "Get information about the current selection in Figma (includes current page and document ids, selection count, and per-node id, name, type, visibility, and size/position when available)", noArgs},
 		{"read_my_design", "Get detailed information about the current selection in Figma, including all node details", noArgs},
 		{"get_node_info", "Get detailed information about a specific node in Figma", objectSchema([]string{"nodeId"}, map[string]any{
 			"nodeId": prop("string", "The ID of the node to get information about"),
@@ -87,6 +87,17 @@ func tools() []tool {
 			"fontColor":  rgbaColor("Font color in RGBA format"),
 			"name":       prop("string", "Semantic layer name for the text node"),
 			"parentId":   prop("string", "Optional parent node ID to append the text to"),
+		})},
+
+		{"create_image", "Create a rectangle with a raster image fill from base64-encoded PNG or JPEG bytes (max decoded size 15MB in the plugin). Use for logos and bitmap assets.", objectSchema([]string{"x", "y", "width", "height", "imageBase64"}, map[string]any{
+			"x":           prop("number", "X position"),
+			"y":           prop("number", "Y position"),
+			"width":       prop("number", "Width of the image bounds"),
+			"height":      prop("number", "Height of the image bounds"),
+			"imageBase64": prop("string", "Base64-encoded PNG or JPEG file bytes; optional data URL prefix (e.g. data:image/png;base64,) is stripped"),
+			"name":        prop("string", "Optional layer name (default: Image)"),
+			"parentId":    prop("string", "Optional parent node ID to append the rectangle to"),
+			"scaleMode":   stringEnum("Image scale inside the rectangle", "FIT", "FILL", "CROP", "TILE"),
 		})},
 
 		{"set_fill_color", "Set the fill color of a node in Figma. Works on TextNode or FrameNode and similar shape nodes.", objectSchema([]string{"nodeId", "r", "g", "b"}, map[string]any{
@@ -139,6 +150,22 @@ func tools() []tool {
 		})},
 
 		{"get_styles", "Get all styles from the current Figma document", noArgs},
+		{"apply_style", "Apply a local document style to a node by id. Use ids from get_styles: styleType FILL=colors (paint/fill style), STROKE=colors as stroke style where supported, TEXT=texts, EFFECT=effects, GRID=grids.", objectSchema([]string{"nodeId", "styleId", "styleType"}, map[string]any{
+			"nodeId":    prop("string", "Target node id"),
+			"styleId":   prop("string", "Local style id from get_styles (colors[].id, texts[].id, effects[].id, or grids[].id)"),
+			"styleType": stringEnum("Which style slot to set on the node", "FILL", "PAINT", "STROKE", "TEXT", "EFFECT", "GRID"),
+		})},
+		{"get_variables", "List local Figma variable collections and variables in the current file (modes, ids, resolvedType, valuesByMode). Use before set_variable_binding.", objectSchema(nil, map[string]any{
+			"resolvedType": stringEnum("Optional: only return variables of this resolved type", "COLOR", "FLOAT", "STRING", "BOOLEAN", "ALIAS"),
+		})},
+		{"set_variable_binding", "Bind a Variable to a node property, or unbind. For COLOR on fills/strokes use field fillPaintColor or strokePaintColor (solid paint at fillIndex/strokeIndex). Otherwise use a setBoundVariable field name supported by the node (e.g. width, height, cornerRadius, opacity, itemSpacing, paddingTop, strokeWeight, fontFamily, fontWeight, lineHeight, letterSpacing on TEXT).", objectSchema([]string{"nodeId", "field"}, map[string]any{
+			"nodeId":      prop("string", "Target node id"),
+			"field":       prop("string", "fillPaintColor | strokePaintColor | or a VariableBindable field name for this node type"),
+			"variableId":  prop("string", "Variable id from get_variables (required unless unbind is true)"),
+			"fillIndex":   prop("number", "Fill index when field is fillPaintColor (default 0)"),
+			"strokeIndex": prop("number", "Stroke index when field is strokePaintColor (default 0)"),
+			"unbind":      prop("boolean", "If true, removes the binding (variableId ignored)"),
+		})},
 		{"get_local_components", "Get all local components from the Figma document", noArgs},
 
 		{"get_annotations", "Get all annotations in the current document or specific node", objectSchema([]string{"nodeId"}, map[string]any{

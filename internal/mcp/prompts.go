@@ -2,7 +2,7 @@ package mcp
 
 import _ "embed"
 
-// The six prompts below are loaded verbatim from internal/mcp/skills/*.md
+// The prompts below are loaded verbatim from internal/mcp/skills/*.md
 // at build time via //go:embed, so the canonical source of each instruction
 // prompt is its Markdown file.
 
@@ -23,6 +23,9 @@ var swapOverridesInstancesText string
 
 //go:embed skills/reaction_to_connector_strategy.md
 var reactionToConnectorStrategyText string
+
+//go:embed skills/variable_strategy.md
+var variableStrategyText string
 
 func prompts() []prompt {
 	return []prompt{
@@ -55,6 +58,11 @@ func prompts() []prompt {
 			Name:        "reaction_to_connector_strategy",
 			Description: "Strategy for converting Figma prototype reactions to connector lines using the output of 'get_reactions'",
 			Text:        reactionToConnectorStrategyText,
+		},
+		{
+			Name:        "variable_strategy",
+			Description: "How to read local Figma variables and bind them to nodes with get_variables and set_variable_binding",
+			Text:        variableStrategyText,
 		},
 	}
 }

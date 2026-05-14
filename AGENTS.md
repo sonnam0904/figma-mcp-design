@@ -31,5 +31,6 @@ go run ./cmd/mcp-server
 
 - Call `join_channel` before other Figma tools.
 - Call `get_document_info`, `read_my_design`, or `get_selection` before modifying designs.
+- **MCP scope:** The plugin-backed toolset covers frames/rectangles/text, **create_image** (base64 PNG/JPEG), **apply_style** (local styles from **get_styles**), **get_variables** / **set_variable_binding** (local Figma Variables), basic fills and strokes, auto-layout helpers, components/instances, text batch updates, annotations, exports, and reaction→connector flows. It does **not** include URL-based image fetch, arbitrary vector/boolean editing, full prototype authoring, or full library-variable management unless listed in `internal/mcp/tools.go`. Use **read_design_strategy**, **design_strategy**, and **variable_strategy** prompts as needed.
 - Keep stdout clean in MCP server code; use stderr/log package for diagnostics.
 - Prefer adding tools in `internal/mcp/tools.go` and forwarding through `internal/mcp/server.go`.
